@@ -5,12 +5,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=user
         fields='__all__'
-    def create(self, validated_data):
-       password = validated_data.pop('password')
-       User = user(**validated_data)
-       User.set_password(password)
-       User.save()
-       return User
 
 class loginSerializer(serializers.Serializer):
     email=serializers.EmailField()

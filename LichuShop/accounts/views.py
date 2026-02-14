@@ -19,7 +19,11 @@ def register(request):
     if User.objects.exists():
         return Response({"message":"user already exist! try to another way"},status=status.HTTP_400_BAD_REQUEST)
     if serializer.is_valid():
-        serializer.save()
+        user_data=serializer.validated_data
+        password=user_data.pop("password")
+        user=User(**user_data)
+        user.set_password(password)
+        user.save()
         return Response({"message": "User created successfully"},status=status.HTTP_201_CREATED)
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)  
 
