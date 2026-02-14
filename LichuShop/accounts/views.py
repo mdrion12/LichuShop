@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
-from .serializers import UserSerializer,loginSerializer
+from .serializers import UserSerializer,loginSerializer,ResetPasswordSerializer
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -16,7 +16,7 @@ def register(request):
     
     serializer=UserSerializer(data=request.data)
     
-    if User.objects.exist():
+    if User.objects.exists():
         return Response({"message":"user already exist! try to another way"},status=status.HTTP_400_BAD_REQUEST)
     if serializer.is_valid():
         serializer.save()
@@ -26,11 +26,12 @@ def register(request):
 @api_view(['POST'])
 def login(request):
     serializer=loginSerializer(data=request.data)
-    if serializer.is_valid:
-        user=authenticate(email=serializer.validated_data['email'],password=serializer.validated_data['password'])
+    if serializer.is_valid():
+        email=serializer.validated_data['email']
+        password=serializer.validated_data['password']
+        user=authenticate(email=email,password=password)
         if not user:
             return Response({"error": "Invalid credentials"}, status=400)
-        
         refresh=RefreshToken.for_user(user)
         access_token=str(refresh.access_token)
         refresh_token=str(refresh)
@@ -63,7 +64,7 @@ def send_otp(request):
     except Exception as e:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     
-    reset_otp=ResetPassword(user=user)
+    reset_otp,_=ResetPassword.objects.get_or_create(user=user)
     otp=reset_otp.generate_otp()
     send_mail(
         subject="Your Password Reset OTP",
@@ -74,5 +75,34 @@ def send_otp(request):
     )
     return Response({"message": "OTP sent to email"}, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def reset_password(request):
+    serializer=ResetPasswordSerializer(data=request.data)
+    if serializer.is_valid():
+        email=serializer.validated_data['email']
+        otp=serializer.validated_data['otp']
+        new_password=serializer.validated_data['new_password']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            reset_obj, _ = ResetPassword.objects.get_or_create(user=user)
+        except ResetPassword.DoesNotExist:
+            return Response({"error": "Reset request not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if reset_obj.otp!=otp:
+            return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        reset_obj.verified = True
+        reset_obj.save()
+        return Response({"message": "Password reset successfully"}, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
    
+
+
