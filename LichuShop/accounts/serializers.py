@@ -1,15 +1,9 @@
 from rest_framework import serializers
-from .models import user,ResetPassword
+from .models import user
 
 class UserSerializer(serializers.ModelSerializer):
-    class meta:
+    class Meta:
         model=user
-        fields='__all__'
-
-
-class ResetPasswordSerializer(serializers.ModelSerializer):
-    class meta:
-        model=ResetPassword
         fields='__all__'
 
 class loginSerializer(serializers.Serializer):
