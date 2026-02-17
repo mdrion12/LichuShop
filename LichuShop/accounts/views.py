@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
-from .serializers import UserSerializer,loginSerializer,ResetPasswordSerializer
+from .serializers import UserSerializer,loginSerializer,ResetPasswordSerializer, sendOtpSerializer
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -59,25 +59,25 @@ def logout(request):
 
 @api_view(['POST'])
 def send_otp(request):
-    email=request.data.get("email")
-    if not email:
-        return Response({"error": "Email required"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    try:
-        user=User.objects.get(email=email)
-    except Exception as e:
-        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    
-    reset_otp,_=ResetPassword.objects.get_or_create(user=user)
-    otp=reset_otp.generate_otp()
-    send_mail(
-        subject="Your Password Reset OTP",
-        message=f"Your OTP is: {otp}",
-        from_email="noreply@example.com",
-        recipient_list=[email],
-        fail_silently=False,
-    )
-    return Response({"message": "OTP sent to email"}, status=status.HTTP_200_OK)
+    serializer=sendOtpSerializer(data=request.data)
+    if serializer.is_valid():
+        email=serializer.validated_data["email"]
+        try:
+            user=User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        send_otp,_=ResetPassword.objects.get_or_create(user=user)
+        otp=send_otp.generate_otp()
+        send_mail(
+            subject="Your Password Reset OTP",
+            message=f"Your OTP is: {otp}",
+            from_email="noreply@example.com",
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        return Response({"message": "OTP sent to email"}, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def reset_password(request):
