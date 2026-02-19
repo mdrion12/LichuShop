@@ -1,3 +1,6 @@
+from asyncio.windows_events import NULL
+from tarfile import NUL
+from typing import Required
 from django.db import models
 # Create your models here
 class Customer(models.Model):
@@ -11,8 +14,8 @@ class Customer(models.Model):
 class Product(models.Model):
     id=models.AutoField(primary_key=True)
     product_name=models.CharField(max_length=250)
-    product_image=models.ImageField()
-    product_descriptin=models.CharField(max_length=300)
+    product_image=models.ImageField(upload_to='products/', null=True, blank=True)
+    product_description=models.CharField(max_length=300)
     price=models.IntegerField()
     stock=models.IntegerField()
     is_active=models.BooleanField(default=True)

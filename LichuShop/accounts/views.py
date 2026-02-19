@@ -1,8 +1,14 @@
+from functools import partial
+from pickle import TRUE
+from urllib import request
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.urls import is_valid_path
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
-from .serializers import UserSerializer,loginSerializer,ResetPasswordSerializer, sendOtpSerializer
+
+from clients.models import Product
+from .serializers import UserSerializer,loginSerializer,ResetPasswordSerializer, sendOtpSerializer,productListSerializer
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -108,5 +114,41 @@ def reset_password(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def productCreate(request):
+    serializer=productListSerializer(data=request.data)
+    if request.method=='POST':
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT','PATCH'])
+@permission_classes([IsAuthenticated])
+def productUpdate(request,id):
+    try:
+        product=Product.objects.get(id=id)
+    except Exception as e:
+        return Response({"message :":"product not found"},status=status.HTTP_404_NOT_FOUND)
+    partial=True
+    if request.method=='PUT':
+        partial=False
+    
+    serializer=productListSerializer(product,data=request.data,partial=partial)
+    if serializer.is_valid():
+      serializer.save()
+      return Response({"message :":"product updated successfully"})
+    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def productList(request):
+    products = Product.objects.all()
+    serializer = productListSerializer(products, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 
 

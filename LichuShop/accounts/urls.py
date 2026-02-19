@@ -1,10 +1,9 @@
 from django.urls import path
-from .views import register,login,logout,send_otp,reset_password
+from .views import productCreate, productUpdate, register,login,logout,send_otp,reset_password,productList
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
     TokenVerifyView,
-    
 
 )
 
@@ -17,5 +16,8 @@ urlpatterns = [
     path('logout/',logout,name='logout'),
     path('send_otp/',send_otp,name='send_otp'),
     path('reset_password/',reset_password,name='reset_password'),
+    path('productCreate/',productCreate,name='productCreate'),
+    path('productUpdate/<int:id>/',productUpdate,name='update_product'),
+    path('productList/',productList,name='productList'),
     
 ]

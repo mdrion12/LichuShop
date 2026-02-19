@@ -1,4 +1,9 @@
+from dataclasses import field
+from pyclbr import Class
+from unittest.util import _MAX_LENGTH
 from rest_framework import serializers
+
+from clients.models import Product
 from .models import user
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,3 +22,14 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 class sendOtpSerializer(serializers.Serializer):
     email=serializers.EmailField()
+
+class productListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Product
+        fields='__all__'
+
+
+
+
+
+
