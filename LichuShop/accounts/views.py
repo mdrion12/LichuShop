@@ -124,9 +124,9 @@ def productCreate(request):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['PUT','PATCH'])
+@api_view(['PUT','PATCH','DELETE','GET'])
 @permission_classes([IsAuthenticated])
-def productUpdate(request,id):
+def productUpdatedelete(request,id):
     try:
         product=Product.objects.get(id=id)
     except Exception as e:
@@ -134,11 +134,14 @@ def productUpdate(request,id):
     partial=True
     if request.method=='PUT':
         partial=False
-    
+    if request.method=='DELETE':
+        product.delete()
+        return Response({"message :":"product deleted successfully"})
     serializer=productListSerializer(product,data=request.data,partial=partial)
     if serializer.is_valid():
       serializer.save()
       return Response({"message :":"product updated successfully"})
+    
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
