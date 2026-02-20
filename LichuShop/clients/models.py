@@ -5,7 +5,7 @@ from django.db import models
 # Create your models here
 class Customer(models.Model):
     name=models.CharField(max_length=100)
-    phone_number=models.CharField(primary_key=True)
+    phone_number=models.CharField(primary_key=True,max_length=11)
     address=models.CharField(max_length=100)
     datetime=models.DateTimeField(auto_now_add=True)
     def __str__(self):
@@ -22,7 +22,7 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.id}-{self.product_name}"
 
-class order(models.Model):
+class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
@@ -37,8 +37,8 @@ class order(models.Model):
     def __str__(self):
         return f"{self.phone_number.name}-{self.status}"
 
-class order_item(models.Model):
-    order_id=models.ForeignKey(order,on_delete=models.CASCADE)
+class Order_item(models.Model):
+    order_id=models.ForeignKey(Order,on_delete=models.CASCADE)
     product_id=models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity=models.IntegerField()
     price=models.IntegerField()

@@ -1,7 +1,9 @@
 from dataclasses import field
 from pyclbr import Class
 from unittest.util import _MAX_LENGTH
+from attr import fields
 from rest_framework import serializers
+from clients.models import Order
 
 from clients.models import Product
 from .models import user
@@ -29,7 +31,10 @@ class productListSerializer(serializers.ModelSerializer):
         fields='__all__'
 
 
-
+class orderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Order
+        fields='__all__'
 
 
 
