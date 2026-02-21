@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import change
+from .views import order_create
 urlpatterns = [
-    path('clients/',change),
+    path('ordercreation/',order_create),
 ]

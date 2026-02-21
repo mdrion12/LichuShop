@@ -3,7 +3,6 @@ from urllib import response
 
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
-from yaml import serialize
 from clients.models import Product,Order
 from .serializers import UserSerializer,loginSerializer,ResetPasswordSerializer, orderSerializer, sendOtpSerializer,productListSerializer
 from rest_framework import status
@@ -148,14 +147,7 @@ def productList(request):
     serializer = productListSerializer(products, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def order(request):
-    status_value=request.query_params.get('status')
-    order=Order.objects.filter(status=status_value)
-    serialize=orderSerializer(order,many=True)
-    return Response(serialize.data,status=status.HTTP_200_OK)
-    
+
        
       
 

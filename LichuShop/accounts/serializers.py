@@ -1,7 +1,6 @@
 from dataclasses import field
 from pyclbr import Class
 from unittest.util import _MAX_LENGTH
-from attr import fields
 from rest_framework import serializers
 from clients.models import Order
 
