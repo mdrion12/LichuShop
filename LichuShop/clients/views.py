@@ -1,8 +1,9 @@
 
+from itertools import product
 from tkinter.tix import Tree
 
 from rest_framework.decorators import api_view,permission_classes
-from .serializers import OrderCreationSerializer,orderserilizer
+from .serializers import OrderCreationSerializer,orderserilizer,orderDetailSerializer
 from .models import Customer,Order,Product,Order_item
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -46,6 +47,7 @@ def order_create(request):
 def orders(request):
      order=Order.objects.select_related('phone_number').filter(status='pending')
      serializer=orderserilizer(order,many=True)
+     serializer.is_valid()
      return Response(serializer.data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -53,4 +55,42 @@ def orders(request):
 def orderstatus(request,order_status):
      order=Order.objects.select_related('phone_number').filter(status=order_status)
      serializer=orderserilizer(order,many=True)
+     serializer.is_valid()
      return Response(serializer.data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def order_details(request, order_id):
+
+    orderitem = Order_item.objects.select_related(
+        'order_id__phone_number', 
+        'product_id'
+    ).filter(order_id=order_id)
+
+    if not orderitem.exists():
+        return Response({'error': 'Order not found'}, status=404)
+
+    first_item = orderitem.first()
+    customer_name = first_item.order_id.phone_number.name
+    phone_number = first_item.order_id.phone_number.phone_number
+    address = first_item.order_id.phone_number.address
+
+    productlist = []
+    for item in orderitem:
+        products = {
+            "product_name": item.product_id.product_name,
+            "product_price": item.product_id.price,
+            "product_description": item.product_id.product_description,
+            "product_image": item.product_id.product_image.url if item.product_id.product_image else None,
+            "product_quantity": item.quantity,
+            "total_price": item.price
+        }
+        productlist.append(products)
+
+    serializer = orderDetailSerializer(data={
+        "customer_name": customer_name,
+        "phone_number": phone_number,
+        "address": address,
+        "productlist": productlist
+    })
+    serializer.is_valid() 
+    return Response(serializer.data, status=200)
