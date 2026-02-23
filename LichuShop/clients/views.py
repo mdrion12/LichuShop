@@ -1,6 +1,6 @@
 
 from rest_framework.decorators import api_view
-from .serializers import OrderCreationSerializer
+from .serializers import OrderCreationSerializer,orderserilizer
 from .models import Customer,Order,Product,Order_item
 from rest_framework.response import Response
 from rest_framework import status
@@ -37,4 +37,9 @@ def order_create(request):
         return Response({"message": "Order created successfully", "order_id": order.id}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        
+@api_view(['GET'])
+def orders(request):
+     order=Order.objects.select_related('phone_number').filter(status='pending')
+     serializer=orderserilizer(order,many=True)
+     print(serializer.data)
+     return Response(serializer.data,status=status.HTTP_200_OK)
