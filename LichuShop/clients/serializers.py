@@ -36,6 +36,10 @@ class ProductSerializer(serializers.ModelSerializer):
         model=Product
         fields='__all__'
 
+
+class orderStatusserializer(serializers.Serializer):
+    status=serializers.CharField(max_length=20)
+        
 class OrderProductSerializer(serializers.Serializer):
     product_name = serializers.CharField(max_length=250)
     product_price = serializers.IntegerField()
@@ -43,10 +47,9 @@ class OrderProductSerializer(serializers.Serializer):
     product_image = serializers.CharField(allow_null=True)
     quantity = serializers.IntegerField()
     total_price = serializers.IntegerField()    
+    
 class orderDetailSerializer(serializers.Serializer):
     customer_name=serializers.CharField(max_length=50)
     phone_number=serializers.CharField(max_length=11)
     address=serializers.CharField(max_length=11)
     productlist=OrderProductSerializer(many=True)
-
-   

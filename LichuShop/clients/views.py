@@ -1,9 +1,12 @@
 
+from functools import partial
 from itertools import product
+import re
 from tkinter.tix import Tree
 
 from rest_framework.decorators import api_view,permission_classes
-from .serializers import OrderCreationSerializer,orderserilizer,orderDetailSerializer
+from yaml import serialize
+from .serializers import OrderCreationSerializer,orderserilizer,orderDetailSerializer,orderStatusserializer
 from .models import Customer,Order,Product,Order_item
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -47,7 +50,6 @@ def order_create(request):
 def orders(request):
      order=Order.objects.select_related('phone_number').filter(status='pending')
      serializer=orderserilizer(order,many=True)
-     serializer.is_valid()
      return Response(serializer.data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -55,10 +57,25 @@ def orders(request):
 def orderstatus(request,order_status):
      order=Order.objects.select_related('phone_number').filter(status=order_status)
      serializer=orderserilizer(order,many=True)
-     serializer.is_valid()
      return Response(serializer.data,status=status.HTTP_200_OK)
+    
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def order_Status_change(request,order_id,order_status):
+     order=Order.objects.get(id=order_id)
+     serialize=orderStatusserializer(data={"status":order_status})
+     if serialize.is_valid():
+         order.status=serialize.validated_data['status']
+         order.save()  
+         return Response({"message": "Order status updated successfully"}, status=status.HTTP_200_OK)
+     return Response(serialize.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def order_details(request, order_id):
 
     orderitem = Order_item.objects.select_related(
@@ -81,7 +98,7 @@ def order_details(request, order_id):
             "product_price": item.product_id.price,
             "product_description": item.product_id.product_description,
             "product_image": item.product_id.product_image.url if item.product_id.product_image else None,
-            "product_quantity": item.quantity,
+            "quantity":item.quantity,
             "total_price": item.price
         }
         productlist.append(products)
@@ -92,5 +109,6 @@ def order_details(request, order_id):
         "address": address,
         "productlist": productlist
     })
-    serializer.is_valid() 
-    return Response(serializer.data, status=200)
+    if serializer.is_valid():
+      return Response(serializer.data, status=200)
+    return Response(serializer.errors, status=400)
