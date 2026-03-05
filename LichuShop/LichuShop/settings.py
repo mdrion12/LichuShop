@@ -11,10 +11,8 @@ SECRET_KEY = 'django-insecure-iu5g1$vflnvcg%%66bs)-9azo$r8d%ot*7637@#aum9(&w)zcj
 
 
 DEBUG = False
-ALLOWED_HOSTS = [
-    "reonshop.onrender.com"
-]
-
+# LichuShop/settings.py
+ALLOWED_HOSTS = ['lichushop-1.onrender.com', '127.0.0.1', 'localhost']
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
