@@ -1,6 +1,4 @@
-from asyncio.windows_events import NULL
-from tarfile import NUL
-from typing import Required
+
 from django.db import models
 # Create your models here
 class Customer(models.Model):
