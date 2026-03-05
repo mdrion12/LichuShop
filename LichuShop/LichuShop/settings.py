@@ -10,12 +10,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-iu5g1$vflnvcg%%66bs)-9azo$r8d%ot*7637@#aum9(&w)zcj'
 
 
-DEBUG = True
+DEBUG = False
+ALLOWED_HOSTS = [
+    "reonshop.onrender.com"
+]
 
-ALLOWED_HOSTS = []
-
-
-
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -110,7 +111,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+
 # settings.py
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
