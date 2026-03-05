@@ -1,9 +1,6 @@
 
 from functools import partial
 from itertools import product
-import re
-from tkinter.tix import Tree
-
 from rest_framework.decorators import api_view,permission_classes
 from yaml import serialize
 from .serializers import OrderCreationSerializer,orderserilizer,orderDetailSerializer,orderStatusserializer
