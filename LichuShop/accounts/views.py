@@ -8,7 +8,7 @@ from .serializers import UserSerializer,loginSerializer,ResetPasswordSerializer,
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from .models import ResetPassword
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
