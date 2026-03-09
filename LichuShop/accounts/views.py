@@ -141,6 +141,7 @@ def productUpdatedelete(request,id):
     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def productList(request):
     products = Product.objects.all()
     serializer = productListSerializer(products, many=True)
