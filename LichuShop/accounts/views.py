@@ -148,6 +148,13 @@ def productList(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def product(request,id):
+    product=Product.objects.get(id=id)
+    serializer=productListSerializer(product)
+    return Response(serializer.data,status=status.HTTP_200_OK)
+
        
       
 
